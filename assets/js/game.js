@@ -10,6 +10,12 @@ var enemyAttack = 12;
 // You can also log multiple values at once like this
 // console.log(enemyAttack, enemyHealth);
 
+// function to generate a random numeric value
+var randomNumber = function(min, max) {
+    var value = Math.floor(Math.random() * (max - min + 1) + min);
+    return value;
+  };
+
 var fight = function (enemyName) {
     while (playerHealth > 0 && enemyHealth > 0) {
         // ask player if they'd like to fight or run
@@ -24,17 +30,18 @@ var fight = function (enemyName) {
             if (confirmSkip) {
                 window.alert(playerName + ' has decided to skip this fight. Goodbye!');
                 // subtract money from playerMoney for skipping
-                playerMoney = playerMoney - 10;
+                playerMoney = Math.max(0, playerMoney - 10);
                 console.log("playerMoney", playerMoney)
                 break;
             }
         }
 
-        // remove enemy's health by subtracting the amount set in the playerAttack variable
-        enemyHealth = enemyHealth - playerAttack;
+        // generate random damage value based on player's attack power (playerAttack - 3 is the min, playerAttack is the max)
+        var damage = randomNumber(playerAttack - 3, playerAttack);
+        // remove enemy's health by subtracting the amount set in the above damage variable
+        enemyHealth = Math.max(0, enemyHealth - damage);
         console.log(
-            playerName + ' attacked ' + enemyName + '. ' + enemyName + ' now has ' + enemyHealth + ' health remaining.'
-        );
+            playerName + ' attacked ' + enemyName + '. ' + enemyName + ' now has ' + enemyHealth + ' health remaining.');
 
         // check enemy's health
         if (enemyHealth <= 0) {
@@ -49,8 +56,9 @@ var fight = function (enemyName) {
             window.alert(enemyName + ' still has ' + enemyHealth + ' health left.');
         }
 
+        var damage = randomNumber(enemyAttack - 3, enemyAttack);
         // remove players's health by subtracting the amount set in the enemyAttack variable
-        playerHealth = playerHealth - enemyAttack;
+        playerHealth = Math.max(0, playerHealth - damage);
         console.log(
             enemyName + ' attacked ' + playerName + '. ' + playerName + ' now has ' + playerHealth + ' health remaining.'
         );
@@ -70,7 +78,7 @@ var fight = function (enemyName) {
 var startGame = function () {
     // reset player stats
     playerHealth = 100;
-    playerAttack = 30;
+    playerAttack = 10;
     playerMoney = 10;
 
     for (var i = 0; i < enemyNames.length; i++) {
@@ -82,7 +90,8 @@ var startGame = function () {
             var pickedEnemyName = enemyNames[i];
 
             // reset enemyHealth before starting new fight
-            enemyHealth = 50;
+            enemyHealth = randomNumber(40, 60);
+            console.log(enemyHealth);
 
             // use debugger to pause script from running and check what's going on at that moment in the code
             // debugger;
@@ -93,27 +102,28 @@ var startGame = function () {
             // if player is still alive and we're not at the last enemy in the array
             if (playerHealth > 0 && i < enemyNames.length - 1) {
                 // ask if player wants  to use the shop before next round
-                var storeConfirm = window.confirm("the fight is over, visit the shop before the next round?")
+                var storeConfirm = window.confirm("The fight is over, visit the shop before the next round?")
+
                 // if yes, take them to the shop function
                 if (storeConfirm) {
                     shop();
                 }
             }
         }
+        // if player is not alive, break out of the loop and let endGame function run
         else {
             window.alert("You have lost your robot in battle! Game Over!");
-            // after the loop ends, player is either out of health or enemies to fight, so run the endGame function
-            endGame();
             break;
         }
-
     }
-    // play again
-    // startGame();
+    // after the loop ends, player is either out of health or enemies to fight, so run the endGame function
+    endGame();
 };
 
 // function to end the entire game
 var endGame = function () {
+    window.alert("The game has now ended. Let's see how you did!");
+
     // if player is still alive, player wins!
     if (playerHealth > 0) {
         window.alert("Great job, you've survived the game! You now have a score of " + playerMoney + ".");
